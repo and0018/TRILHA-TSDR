@@ -1,5 +1,5 @@
 // js/db.js
-// Camada de banco de dados unificada: IndexedDB (local) & Firebase (Firestore / Storage)
+// Camada de banco de dados unificada: IndexedDB (local) & Supabase (PostgreSQL + Storage)
 
 const DB_NAME = 'TrailEventDB';
 const DB_VERSION = 1;
@@ -7,37 +7,30 @@ const STORE_NAME = 'registrations';
 
 class TrailDatabase {
   constructor() {
-    this.firebaseActive = false;
-    this.db = null; // Instância IndexedDB
+    this.supabaseActive = false;
+    this.db = null;
+    this.supabase = null;
   }
 
-  // Inicializa o banco de dados
   async init() {
-    // 1. Tenta inicializar o Firebase se houver chaves configuradas
-    const config = window.FIREBASE_CONFIG;
-    const hasFirebaseKeys = config && config.apiKey && config.apiKey.trim() !== "" && config.projectId && config.projectId.trim() !== "";
+    const config = window.SUPABASE_CONFIG;
+    const hasKeys = config && config.url && config.url.trim() !== "" && config.anonKey && config.anonKey.trim() !== "";
 
-    if (hasFirebaseKeys) {
+    if (hasKeys) {
       try {
-        console.log("Detectadas chaves do Firebase. Inicializando conexão com a nuvem...");
-        
-        // Verifica se os SDKs do Firebase estão disponíveis globalmente
-        if (typeof firebase !== 'undefined') {
-          firebase.initializeApp(config);
-          this.firestore = firebase.firestore();
-          this.storage = firebase.storage();
-          this.firebaseActive = true;
-          console.log("Firebase conectado e ativo com sucesso!");
-          return true;
+        console.log("Detectadas chaves do Supabase. Inicializando conexão...");
+        if (typeof supabase !== 'undefined') {
+          this.supabase = supabase.createClient(config.url, config.anonKey);
+          this.supabaseActive = true;
+          console.log("Supabase conectado com sucesso!");
         } else {
-          console.warn("SDKs do Firebase não foram carregados no HTML. Usando IndexedDB local.");
+          console.warn("SDK do Supabase não carregado no HTML. Usando IndexedDB local.");
         }
       } catch (err) {
-        console.error("Erro ao conectar ao Firebase, usando IndexedDB como fallback:", err);
+        console.error("Erro ao conectar ao Supabase, usando IndexedDB como fallback:", err);
       }
     }
 
-    // 2. Fallback para IndexedDB local
     console.log("Inicializando banco de dados local (IndexedDB)...");
     try {
       this.db = await this.initIndexedDB();
@@ -49,12 +42,10 @@ class TrailDatabase {
     }
   }
 
-  // Verifica se o Firebase está ativo
-  isFirebaseActive() {
-    return this.firebaseActive;
+  isSupabaseActive() {
+    return this.supabaseActive;
   }
 
-  // Configura a conexão do IndexedDB
   initIndexedDB() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -65,9 +56,7 @@ class TrailDatabase {
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
         if (!db.objectStoreNames.contains(STORE_NAME)) {
-          // Cria o Object Store usando 'id' como chave
           const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-          // Cria índices úteis
           store.createIndex('status', 'status', { unique: false });
           store.createIndex('vehicleType', 'vehicleType', { unique: false });
           store.createIndex('date', 'date', { unique: false });
@@ -76,7 +65,13 @@ class TrailDatabase {
     });
   }
 
-  // Salva uma nova inscrição
+  _withTimeout(promise, ms, label) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout: ${label} excedeu ${ms}ms`)), ms))
+    ]);
+  }
+
   async saveRegistration(data) {
     const registrationId = 'reg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     const registrationData = {
@@ -92,29 +87,52 @@ class TrailDatabase {
       date: new Date().toISOString()
     };
 
-    if (this.firebaseActive) {
+    if (this.supabaseActive) {
       try {
-        console.log("Salvando dados no Firebase Firestore...");
-        
-        // 1. Faz upload das fotos para o Firebase Storage
-        const idPhotoUrl = await this.uploadFileToFirebase(data.idPhotoFile, `ids/${registrationId}`);
-        const receiptUrl = await this.uploadFileToFirebase(data.receiptFile, `receipts/${registrationId}`);
-        
+        console.log("Salvando dados no Supabase...");
+
+        const idPhotoUrl = await this._withTimeout(
+          this.uploadFileToSupabase(data.idPhotoFile, `ids/${registrationId}`),
+          30000,
+          'Upload foto ID'
+        );
+        const receiptUrl = await this._withTimeout(
+          this.uploadFileToSupabase(data.receiptFile, `receipts/${registrationId}`),
+          30000,
+          'Upload comprovante'
+        );
+
         registrationData.idPhoto = idPhotoUrl;
         registrationData.paymentReceipt = receiptUrl;
 
-        // 2. Salva o documento no Firestore
-        await this.firestore.collection(STORE_NAME).doc(registrationId).set(registrationData);
-        console.log("Inscrição salva com sucesso no Firestore:", registrationId);
+        const { error } = await this._withTimeout(
+          this.supabase.from('registrations').insert({
+            id: registrationId,
+            full_name: data.fullName,
+            email: data.email,
+            age: parseInt(data.age),
+            location: data.location,
+            phone: data.phone,
+            vehicle_type: data.vehicleType,
+            price: data.price,
+            status: 'Pendente',
+            date: registrationData.date,
+            id_photo: idPhotoUrl,
+            payment_receipt: receiptUrl
+          }),
+          15000,
+          'Salvar no Supabase'
+        );
+
+        if (error) throw error;
+
+        console.log("Inscrição salva com sucesso no Supabase:", registrationId);
         return registrationData;
       } catch (err) {
-        console.error("Erro ao salvar no Firebase. Tentando fallback para IndexedDB local...", err);
-        // Fallback rápido se falhar a rede no meio do processo
+        console.error("Erro ao salvar no Supabase. Tentando fallback para IndexedDB local...", err);
       }
     }
 
-    // Processamento local com IndexedDB
-    // Converte os arquivos para strings Base64
     console.log("Salvando dados no IndexedDB local...");
     const idPhotoBase64 = await this.fileToBase64(data.idPhotoFile);
     const receiptBase64 = await this.fileToBase64(data.receiptFile);
@@ -135,30 +153,42 @@ class TrailDatabase {
     });
   }
 
-  // Lista todas as inscrições
   async getAllRegistrations() {
-    if (this.firebaseActive) {
+    if (this.supabaseActive) {
       try {
-        console.log("Buscando inscrições do Firebase Firestore...");
-        const snapshot = await this.firestore.collection(STORE_NAME).orderBy('date', 'desc').get();
-        const list = [];
-        snapshot.forEach(doc => {
-          list.push(doc.data());
-        });
-        return list;
+        console.log("Buscando inscrições do Supabase...");
+        const { data, error } = await this.supabase
+          .from('registrations')
+          .select('*')
+          .order('date', { ascending: false });
+
+        if (error) throw error;
+
+        return data.map(r => ({
+          id: r.id,
+          fullName: r.full_name,
+          email: r.email,
+          age: r.age,
+          location: r.location,
+          phone: r.phone,
+          vehicleType: r.vehicle_type,
+          price: r.price,
+          status: r.status,
+          date: r.date,
+          idPhoto: r.id_photo,
+          paymentReceipt: r.payment_receipt
+        }));
       } catch (err) {
-        console.error("Erro ao buscar no Firebase, usando IndexedDB local como fallback:", err);
+        console.error("Erro ao buscar no Supabase, usando IndexedDB local como fallback:", err);
       }
     }
 
-    // Listagem local
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([STORE_NAME], 'readonly');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.getAll();
 
       request.onsuccess = () => {
-        // Ordena por data decrescente (mais recente primeiro)
         const sorted = request.result.sort((a, b) => new Date(b.date) - new Date(a.date));
         resolve(sorted);
       };
@@ -166,21 +196,22 @@ class TrailDatabase {
     });
   }
 
-  // Atualiza o status de uma inscrição (Pendente -> Validado)
   async updateRegistrationStatus(id, newStatus) {
-    if (this.firebaseActive) {
+    if (this.supabaseActive) {
       try {
-        console.log(`Atualizando status no Firebase Firestore para a inscrição: ${id}...`);
-        await this.firestore.collection(STORE_NAME).doc(id).update({
-          status: newStatus
-        });
+        console.log(`Atualizando status no Supabase para inscrição: ${id}...`);
+        const { error } = await this.supabase
+          .from('registrations')
+          .update({ status: newStatus })
+          .eq('id', id);
+
+        if (error) throw error;
         return true;
       } catch (err) {
-        console.error("Erro ao atualizar status no Firebase:", err);
+        console.error("Erro ao atualizar status no Supabase:", err);
       }
     }
 
-    // Atualização local
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
@@ -204,24 +235,22 @@ class TrailDatabase {
     });
   }
 
-  // Auxiliar: Envia arquivo para o Firebase Storage e retorna a URL de download
-  uploadFileToFirebase(file, path) {
-    return new Promise((resolve, reject) => {
-      const storageRef = this.storage.ref(path);
-      const uploadTask = storageRef.put(file);
+  async uploadFileToSupabase(file, path) {
+    const { data, error } = await this.supabase
+      .storage
+      .from('registrations')
+      .upload(path, file, { upsert: true });
 
-      uploadTask.on('state_changed', 
-        null, 
-        (error) => reject(error), 
-        async () => {
-          const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
-          resolve(downloadUrl);
-        }
-      );
-    });
+    if (error) throw error;
+
+    const { data: { publicUrl } } = this.supabase
+      .storage
+      .from('registrations')
+      .getPublicUrl(data.path);
+
+    return publicUrl;
   }
 
-  // Auxiliar: Converte objeto File para string Base64 para persistência local
   fileToBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -232,5 +261,4 @@ class TrailDatabase {
   }
 }
 
-// Expõe uma única instância global do banco de dados
 window.db = new TrailDatabase();

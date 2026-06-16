@@ -104,9 +104,9 @@ class TrailApp {
     if (!badge) return;
     badge.classList.remove('hidden');
 
-    if (window.db.isFirebaseActive()) {
+    if (window.db.isSupabaseActive()) {
       dot.className = 'w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(242,116,5,0.7)]';
-      text.innerText = 'Firebase Nuvem';
+      text.innerText = 'Supabase Nuvem';
       text.className = 'text-orange-400 font-medium';
     } else {
       dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.7)]';
