@@ -1,0 +1,189 @@
+/* css/style.css */
+/* Estilos Customizados e Ajustes Finos (Design Premium e Aventura) */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --font-title: 'Outfit', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --color-primary: #F27405; /* Laranja Off-Road */
+  --color-primary-hover: #D95204; /* Laranja Escuro */
+  --color-accent: #F29F05; /* Dourado / Amarelo do Banner */
+  --color-accent-hover: #D98E04;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #100C08; /* Earthy Dark Black (Preto Terroso) */
+  color: #F3F4F6;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #17110C;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2C1E14;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #422D1D;
+}
+
+/* Glassmorphism Styles */
+.glass-panel {
+  background: rgba(26, 19, 14, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(242, 116, 5, 0.12);
+}
+
+.glass-card {
+  background: rgba(38, 28, 20, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(38, 28, 20, 0.7);
+  border-color: rgba(242, 116, 5, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(242, 116, 5, 0.2);
+}
+
+/* Hero Overlay background image fallback */
+.bg-adventure {
+  background-image: linear-gradient(to bottom, rgba(16, 12, 8, 0.8), rgba(16, 12, 8, 0.96)), url('../assets/adventure_bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Pulse Glow */
+.glow-orange {
+  box-shadow: 0 0 15px rgba(242, 116, 5, 0.3);
+  animation: pulseGlowOrange 2s infinite alternate;
+}
+
+@keyframes pulseGlowOrange {
+  0% {
+    box-shadow: 0 0 10px rgba(242, 116, 5, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(242, 116, 5, 0.55);
+  }
+}
+
+/* Custom Checkbox styles for active state */
+.custom-tab-active {
+  position: relative;
+}
+.custom-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-primary);
+}
+
+/* Print Styles for Voucher */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #print-voucher-container, #print-voucher-container * {
+    visibility: visible;
+  }
+  #print-voucher-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+  /* Remove backgrounds/borders for print layout */
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Estado de Seleção Ativa dos Cards de Veículos */
+label:has(input[name="vehicle-select"]:checked) {
+  border-color: var(--color-primary) !important;
+  background-color: rgba(38, 28, 20, 0.95) !important;
+  box-shadow: 0 0 20px rgba(242, 116, 5, 0.25) !important;
+  transform: translateY(-2px);
+}
+
+label:has(input[name="vehicle-select"]:checked) .vehicle-price {
+  color: #FFFFFF !important;
+}
+
+label:has(input[name="vehicle-select"]:checked) .radio-outer {
+  border-color: var(--color-primary) !important;
+}
+
+label:has(input[name="vehicle-select"]:checked) .radio-inner {
+  transform: scale(1) !important;
+}

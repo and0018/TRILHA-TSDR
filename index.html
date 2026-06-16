@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>12º Trilhão TSDR Amajari Off Road - Inscrições</title>
+  
+  <!-- Tailwind CSS v4 CDN (Browser Build) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <!-- CSS Customizado -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Firebase SDKs (Compat para facilitar uso via CDN sem bundler) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-full flex flex-col antialiased">
+
+  <!-- NOTIFICAÇÃO TOAST GLOBAL -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- NAVEGAÇÃO / CABEÇALHO -->
+  <header class="sticky top-0 z-40 w-full border-b border-white/5 bg-slate-950/70 backdrop-blur-md no-print">
+    <div class="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <!-- Logo -->
+      <a href="#" onclick="app.showView('landing')" class="flex items-center gap-2 text-orange-500 font-extrabold text-xl sm:text-2xl tracking-wider select-none">
+        <i data-lucide="mountain-snow" class="w-7 h-7 animate-pulse text-orange-500"></i>
+        <span>TSDR<span class="text-white"> AMAJARI</span></span>
+      </a>
+
+      <!-- Botões de Ação -->
+      <div class="flex items-center gap-4">
+        <!-- Indicador de Status do Banco de Dados (Firebase ou Local) -->
+        <div id="db-status-badge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 border border-slate-700 text-slate-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-500" id="db-status-dot"></span>
+          <span id="db-status-text">Conectando...</span>
+        </div>
+
+        <button id="admin-access-btn" onclick="app.openAdminAccess()" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white bg-slate-900 border border-white/10 hover:border-orange-500/50 rounded-lg transition-all duration-300 shadow-sm cursor-pointer">
+          <i data-lucide="lock" class="w-4 h-4 text-orange-500"></i>
+          <span>Painel Admin</span>
+        </button>
+        
+        <button id="admin-logout-btn" onclick="app.logoutAdmin()" class="hidden items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-950/40 border border-red-500/30 hover:bg-red-900/50 rounded-lg transition-all duration-300 cursor-pointer">
+          <i data-lucide="log-out" class="w-4 h-4 text-red-400"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+    
+    <!-- ==================== TELA 1: LANDING PAGE ==================== -->
+    <section id="view-landing" class="bg-adventure min-h-[calc(100vh-4rem)] flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-7xl w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-8">
+        
+        <!-- Apresentação do Evento -->
+        <div class="flex-1 text-center lg:text-left animate-fade-in-up">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/10 border border-orange-500/20 text-orange-400 mb-6 uppercase tracking-wider">
+            <i data-lucide="trophy" class="w-3.5 h-3.5"></i> 12º Trilhão Oficial
+          </span>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6">
+            12º Trilhão <br class="hidden sm:inline">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500">
+              TSOR Amajari Off Road
+            </span>
+          </h1>
+
+          <div class="flex flex-wrap items-center gap-3 mb-6 justify-center lg:justify-start">
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-orange-500/20 border border-orange-500/40 text-orange-400 uppercase tracking-wide">
+              <i data-lucide="calendar" class="w-4 h-4"></i> Sábado, 11 de Julho
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-amber-500/20 border border-amber-500/40 text-amber-400 uppercase tracking-wide">
+              <i data-lucide="map-pin" class="w-4 h-4"></i> Amajari - Roraima
+            </span>
+          </div>
+
+          <p class="text-slate-300 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-6 leading-relaxed">
+            Garanta sua inscrição no maior evento off-road de Roraima! Percurso desafiador para motos, quadriciclos, UTVs e jipes. Apoio completo no trajeto e almoço incluso para todos os atletas inscritos.
+          </p>
+          
+          <!-- Contatos Rápidos do Cartaz -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center text-sm text-slate-400 mb-8 font-mono">
+            <div class="flex items-center gap-1.5"><i data-lucide="phone" class="w-4 h-4 text-orange-400"></i> (95) 98404-7388</div>
+            <div class="flex items-center gap-1.5"><i data-lucide="phone" class="w-4 h-4 text-orange-400"></i> (95) 98412-9061</div>
+          </div>
+
+        </div>
+
+        <!-- Seletor de Veículo / CTA -->
+        <div class="w-full max-w-lg lg:w-[480px] animate-slide-in">
+          <div class="glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <i data-lucide="ticket" class="w-6 h-6 text-orange-500"></i>
+              Escolha sua Categoria
+            </h2>
+            
+            <!-- Cards de categorias de veículos -->
+            <div class="space-y-3 mb-6">
+              <!-- Moto -->
+              <label class="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition-all duration-200 group relative">
+                <input type="radio" name="vehicle-select" value="Moto" data-price="60" class="peer hidden" checked>
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-slate-950 transition-all">
+                    <i data-lucide="bike" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-white text-base">Moto</p>
+                    <p class="text-xs text-slate-400">Trilha de duas rodas tradicional</p>
+                  </div>
+                </div>
+                <div class="text-right flex items-center gap-3">
+                  <span class="font-bold text-orange-400 group-hover:text-white text-base vehicle-price">R$ 60,00</span>
+                  <div class="w-5 h-5 rounded-full border-2 border-slate-700 flex items-center justify-center bg-slate-950 group-hover:border-slate-500 radio-outer">
+                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 scale-0 transition-transform duration-200 radio-inner"></div>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Quadriciclo -->
+              <label class="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition-all duration-200 group relative">
+                <input type="radio" name="vehicle-select" value="Quadriciclo" data-price="150" class="peer hidden">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-slate-950 transition-all">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-white text-base">Quadriciclo</p>
+                    <p class="text-xs text-slate-400">Estabilidade e força nas 4 rodas</p>
+                  </div>
+                </div>
+                <div class="text-right flex items-center gap-3">
+                  <span class="font-bold text-orange-400 group-hover:text-white text-base vehicle-price">R$ 150,00</span>
+                  <div class="w-5 h-5 rounded-full border-2 border-slate-700 flex items-center justify-center bg-slate-950 group-hover:border-slate-500 radio-outer">
+                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 scale-0 transition-transform duration-200 radio-inner"></div>
+                  </div>
+                </div>
+              </label>
+
+              <!-- UTV -->
+              <label class="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition-all duration-200 group relative">
+                <input type="radio" name="vehicle-select" value="UTV" data-price="200" class="peer hidden">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-slate-950 transition-all">
+                    <i data-lucide="shield" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-white text-base">UTV</p>
+                    <p class="text-xs text-slate-400">Gaiolas de alta performance</p>
+                  </div>
+                </div>
+                <div class="text-right flex items-center gap-3">
+                  <span class="font-bold text-orange-400 group-hover:text-white text-base vehicle-price">R$ 200,00</span>
+                  <div class="w-5 h-5 rounded-full border-2 border-slate-700 flex items-center justify-center bg-slate-950 group-hover:border-slate-500 radio-outer">
+                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 scale-0 transition-transform duration-200 radio-inner"></div>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Jeep -->
+              <label class="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition-all duration-200 group relative">
+                <input type="radio" name="vehicle-select" value="Jeep" data-price="200" class="peer hidden">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-slate-950 transition-all">
+                    <i data-lucide="truck" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-white text-base">Jeep</p>
+                    <p class="text-xs text-slate-400">4x4 raiz, aventura de jipeiros</p>
+                  </div>
+                </div>
+                <div class="text-right flex items-center gap-3">
+                  <span class="font-bold text-orange-400 group-hover:text-white text-base vehicle-price">R$ 200,00</span>
+                  <div class="w-5 h-5 rounded-full border-2 border-slate-700 flex items-center justify-center bg-slate-950 group-hover:border-slate-500 radio-outer">
+                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 scale-0 transition-transform duration-200 radio-inner"></div>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Carona/Zeca -->
+              <label class="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition-all duration-200 group relative">
+                <input type="radio" name="vehicle-select" value="Carona/Zeca" data-price="50" class="peer hidden">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-slate-950 transition-all">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-white text-base">Carona / Zeca</p>
+                    <p class="text-xs text-slate-400">Co-piloto no Jeep/UTV (incluso almoço)</p>
+                  </div>
+                </div>
+                <div class="text-right flex items-center gap-3">
+                  <span class="font-bold text-orange-400 group-hover:text-white text-base vehicle-price">R$ 50,00</span>
+                  <div class="w-5 h-5 rounded-full border-2 border-slate-700 flex items-center justify-center bg-slate-950 group-hover:border-slate-500 radio-outer">
+                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 scale-0 transition-transform duration-200 radio-inner"></div>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Botão CTA -->
+            <button onclick="app.proceedToRegistration()" class="glow-orange w-full py-4 text-slate-950 font-bold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-450 hover:to-amber-400 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 cursor-pointer text-lg">
+              <span>Fazer Inscrição</span>
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TELA 2: REGISTRATION SCREEN ==================== -->
+    <section id="view-registration" class="hidden py-16 px-4 sm:px-6 lg:px-8 bg-slate-950 min-h-[calc(100vh-4rem)]">
+      <div class="mx-auto max-w-4xl">
+        
+        <!-- Breadcrumb / Botão de Voltar -->
+        <button onclick="app.showView('landing')" class="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm font-semibold mb-8 group cursor-pointer transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+          <span>Voltar para a Página Inicial</span>
+        </button>
+
+        <div class="glass-panel rounded-2xl overflow-hidden shadow-2xl">
+          <!-- Cabeçalho do formulário -->
+          <div class="bg-gradient-to-r from-orange-500/10 to-slate-900 border-b border-white/5 p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Formulário de Inscrição</h2>
+              <p class="text-slate-400 text-sm mt-1">Preencha todos os campos obrigatórios para garantir sua vaga.</p>
+            </div>
+            
+            <!-- Resumo da Categoria Detectada Dinamicamente -->
+            <div class="flex items-center gap-4 bg-orange-500/10 border border-orange-500/20 px-4 py-3 rounded-xl">
+              <div id="selected-vehicle-icon-wrapper" class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400">
+                <i data-lucide="bike" id="form-vehicle-icon" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Categoria Selecionada</p>
+                <div class="flex items-baseline gap-2">
+                  <span id="form-vehicle-name" class="font-bold text-white text-lg">Moto</span>
+                  <span id="form-vehicle-price" class="font-extrabold text-orange-400 text-sm">R$ 60,00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulário -->
+          <form id="registration-form" onsubmit="app.handleFormSubmit(event)" class="p-6 sm:p-8 space-y-8" novalidate>
+            
+            <!-- Grid de Campos de Dados -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Nome Completo -->
+              <div class="flex flex-col gap-1.5">
+                <label for="fullName" class="text-sm font-semibold text-slate-300">Nome Completo *</label>
+                <div class="relative">
+                  <input type="text" id="fullName" name="fullName" required placeholder="Digite seu nome completo" class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-700 bg-slate-900/60 focus:bg-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-white placeholder-slate-500 outline-none transition-all">
+                  <i data-lucide="user" class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500"></i>
+                </div>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-fullName">Nome completo é obrigatório.</p>
+              </div>
+
+              <!-- E-mail -->
+              <div class="flex flex-col gap-1.5">
+                <label for="email" class="text-sm font-semibold text-slate-300">E-mail *</label>
+                <div class="relative">
+                  <input type="email" id="email" name="email" required placeholder="exemplo@email.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-700 bg-slate-900/60 focus:bg-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-white placeholder-slate-500 outline-none transition-all">
+                  <i data-lucide="mail" class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500"></i>
+                </div>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-email">Insira um e-mail válido.</p>
+              </div>
+
+              <!-- Idade -->
+              <div class="flex flex-col gap-1.5">
+                <label for="age" class="text-sm font-semibold text-slate-300">Idade *</label>
+                <div class="relative">
+                  <input type="number" id="age" name="age" required min="18" placeholder="Ex: 25" class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-700 bg-slate-900/60 focus:bg-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-white placeholder-slate-500 outline-none transition-all">
+                  <i data-lucide="calendar" class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500"></i>
+                </div>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-age">É necessário ser maior de 18 anos.</p>
+              </div>
+
+              <!-- Cidade / Estado -->
+              <div class="flex flex-col gap-1.5">
+                <label for="location" class="text-sm font-semibold text-slate-300">Cidade / Estado *</label>
+                <div class="relative">
+                  <input type="text" id="location" name="location" required placeholder="Ex: Amajari / RR" class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-700 bg-slate-900/60 focus:bg-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-white placeholder-slate-500 outline-none transition-all">
+                  <i data-lucide="map-pin" class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500"></i>
+                </div>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-location">Cidade e Estado são obrigatórios.</p>
+              </div>
+
+              <!-- Telefone de Contato -->
+              <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label for="phone" class="text-sm font-semibold text-slate-300">WhatsApp / Telefone com DDD *</label>
+                <div class="relative">
+                  <input type="text" id="phone" name="phone" required placeholder="(95) 99999-9999" class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-700 bg-slate-900/60 focus:bg-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-white placeholder-slate-500 outline-none transition-all">
+                  <i data-lucide="phone" class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500"></i>
+                </div>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-phone">Insira um número de telefone com máscara válida.</p>
+              </div>
+            </div>
+
+            <!-- Uploads de Documento de Identidade -->
+            <div class="border-t border-white/5 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Foto do ID -->
+              <div class="flex flex-col gap-2">
+                <span class="text-sm font-semibold text-slate-300">Documento com Foto (RG ou CNH) *</span>
+                <div class="border-2 border-dashed border-slate-700 hover:border-orange-500 rounded-xl p-6 bg-slate-900/20 transition-all text-center relative group cursor-pointer" onclick="document.getElementById('idPhoto').click()">
+                  <input type="file" id="idPhoto" name="idPhoto" accept="image/*" class="hidden" onchange="app.previewImage(this, 'id-preview')">
+                  
+                  <div id="id-preview-container" class="hidden flex-col items-center">
+                    <img id="id-preview" class="max-h-40 rounded-lg object-contain shadow-md mb-3 border border-slate-700">
+                    <p class="text-xs text-orange-400 flex items-center gap-1 font-semibold"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Alterar imagem</p>
+                  </div>
+
+                  <div id="id-upload-placeholder" class="flex flex-col items-center py-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-orange-400 transition-colors mb-3">
+                      <i data-lucide="image" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-sm text-slate-300 font-medium">Carregar Documento</p>
+                    <p class="text-xs text-slate-500 mt-1">Formatos suportados: JPG, PNG. Máx 5MB.</p>
+                  </div>
+                </div>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-idPhoto">Foto do documento de identificação é obrigatória.</p>
+              </div>
+
+              <!-- Upload do Comprovante Pix -->
+              <div class="flex flex-col gap-2">
+                <span class="text-sm font-semibold text-slate-300">Comprovante de Pagamento PIX *</span>
+                <div class="border-2 border-dashed border-slate-700 hover:border-orange-500 rounded-xl p-6 bg-slate-900/20 transition-all text-center relative group cursor-pointer" onclick="document.getElementById('receiptPhoto').click()">
+                  <input type="file" id="receiptPhoto" name="receiptPhoto" accept="image/*" class="hidden" onchange="app.previewImage(this, 'receipt-preview')">
+                  
+                  <div id="receipt-preview-container" class="hidden flex-col items-center">
+                    <img id="receipt-preview" class="max-h-40 rounded-lg object-contain shadow-md mb-3 border border-slate-700">
+                    <p class="text-xs text-orange-400 flex items-center gap-1 font-semibold"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Alterar imagem</p>
+                  </div>
+
+                  <div id="receipt-upload-placeholder" class="flex flex-col items-center py-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-orange-400 transition-colors mb-3">
+                      <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-sm text-slate-300 font-medium">Anexar Comprovante PIX</p>
+                    <p class="text-xs text-slate-500 mt-1">Formatos suportados: JPG, PNG. Máx 5MB.</p>
+                  </div>
+                </div>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-receiptPhoto">O comprovante de pagamento PIX é obrigatório.</p>
+              </div>
+
+            </div>
+
+            <!-- INSTRUÇÃO DE PAGAMENTO PIX DINÂMICO -->
+            <div class="border-t border-white/5 pt-6">
+              <div class="bg-slate-900/80 border border-white/5 rounded-xl p-5 sm:p-6 flex flex-col md:flex-row items-center gap-6">
+                <!-- QR Code Simulado Premium -->
+                <div class="bg-white p-3 rounded-xl flex-shrink-0 relative shadow-lg">
+                  <div class="w-32 h-32 flex items-center justify-center border-2 border-orange-500/20 text-slate-900 relative">
+                    <!-- Detalhes decorativos nos cantos do QR Code -->
+                    <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-orange-600"></div>
+                    <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-orange-600"></div>
+                    <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-orange-600"></div>
+                    <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-orange-600"></div>
+                    
+                    <!-- QR Code central e logotipo simulado -->
+                    <div class="grid grid-cols-5 grid-rows-5 gap-1.5 w-24 h-24 opacity-80" id="pix-qr-simulation">
+                      <!-- Quadrantes simulados em CSS -->
+                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
+                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
+                      <div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-orange-500 rounded-sm scale-110"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
+                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div>
+                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
+                    </div>
+                  </div>
+                  <div class="text-center mt-2">
+                    <span class="text-[10px] font-bold text-slate-800 tracking-wider">PIX INSTANTÂNEO</span>
+                  </div>
+                </div>
+
+                <!-- Textos explicativos e Pix Copia e Cola -->
+                <div class="flex-grow w-full">
+                  <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                    Realize o pagamento PIX
+                  </h3>
+                  <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                    Para confirmar a sua inscrição na categoria <strong id="pix-instruction-category" class="text-orange-400">Moto</strong>, envie o valor exato de <strong id="pix-instruction-price" class="text-orange-400">R$ 60,00</strong>. Salve o comprovante e envie-o no campo de upload ao lado.
+                  </p>
+                  
+                  <!-- Chave Pix copia e cola com botão de ação -->
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-400 font-mono w-full select-all overflow-x-auto">
+                      <span id="pix-copy-key" class="break-all">00020126820014BR.GOV.BCB.PIX0136d5a14a7b-e389-45ca-aa4e-21b97615a7870220Trilhao TSDR Amajari5204000053039865802BR5919SIMONE PINTO GONDIM6009BOA VISTA622605227HeTaj0cpGTfBVUVlXSUIk63040A6D</span>
+                    </div>
+                    <button type="button" onclick="app.copyPixKey()" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all flex-shrink-0 cursor-pointer">
+                      <i data-lucide="copy" class="w-4 h-4 text-orange-400"></i>
+                      <span>Copiar Chave (Celular)</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botão de Envio de Inscrição -->
+            <div class="border-t border-white/5 pt-6 flex justify-end">
+              <button type="submit" class="glow-orange px-8 py-4 bg-orange-500 hover:bg-orange-455 text-slate-950 font-extrabold rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer text-base">
+                <span>Enviar Inscrição</span>
+                <i data-lucide="check" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TELA 3: ADMIN ACCESS (LOGIN POPUP) ==================== -->
+    <div id="modal-admin-login" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-950/80 backdrop-blur-sm no-print">
+      <div class="glass-panel w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-fade-in-up border border-white/10">
+        <div class="p-6 bg-gradient-to-r from-orange-500/10 to-slate-900 border-b border-white/5 flex justify-between items-center">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="shield-alert" class="w-5 h-5 text-orange-500"></i>
+            Acesso Restrito
+          </h3>
+          <button onclick="app.closeAdminAccess()" class="text-slate-400 hover:text-white transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form onsubmit="app.handleAdminLogin(event)" class="p-6 space-y-4">
+          <p class="text-sm text-slate-400 mb-2">Este painel é exclusivo para organizadores validarem inscrições.</p>
+          
+          <div class="flex flex-col gap-1">
+            <label for="admin-user" class="text-xs font-semibold text-slate-300">Usuário</label>
+            <input type="text" id="admin-user" required placeholder="Digite o usuário admin" class="w-full px-3 py-2.5 rounded-lg border border-slate-700 bg-slate-900 text-white text-sm focus:border-orange-500 outline-none transition-all">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label for="admin-password" class="text-xs font-semibold text-slate-300">Senha</label>
+            <input type="password" id="admin-password" required placeholder="Digite a senha" class="w-full px-3 py-2.5 rounded-lg border border-slate-700 bg-slate-900 text-white text-sm focus:border-orange-500 outline-none transition-all">
+          </div>
+
+          <p id="admin-login-error" class="hidden text-xs text-red-400"></p>
+
+          <button type="submit" id="admin-login-submit" class="w-full py-3 mt-2 font-bold text-slate-950 bg-orange-500 hover:bg-orange-400 rounded-lg transition-colors flex justify-center items-center gap-2 cursor-pointer text-sm">
+            <span>Entrar no Painel</span>
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== TELA 4: ADMIN DASHBOARD ==================== -->
+    <section id="view-admin" class="hidden py-8 px-4 sm:px-6 lg:px-8 bg-slate-900 min-h-[calc(100vh-4rem)]">
+      <div class="mx-auto max-w-7xl">
+        
+        <!-- Cabeçalho Dashboard -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2">
+              <i data-lucide="layout-dashboard" class="w-7 h-7 text-orange-500"></i>
+              Painel de Administração
+            </h2>
+            <p class="text-slate-400 text-sm mt-1">Visualize, filtre e valide inscrições dos atletas off-road.</p>
+          </div>
+          
+          <button onclick="app.refreshDashboard()" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-sm font-semibold transition-all self-start md:self-auto cursor-pointer">
+            <i data-lucide="refresh-cw" class="w-4 h-4 text-orange-500" id="refresh-icon"></i>
+            <span>Atualizar Painel</span>
+          </button>
+        </div>
+
+        <!-- Métrica Header Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          
+          <!-- Inscritos Totais -->
+          <div class="glass-panel p-5 rounded-xl flex items-center justify-between relative overflow-hidden">
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Inscritos Totais</p>
+              <h3 class="text-3xl font-extrabold text-white mt-1" id="stat-total">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-blue-500"></div>
+          </div>
+
+          <!-- Pendentes -->
+          <div class="glass-panel p-5 rounded-xl flex items-center justify-between relative overflow-hidden">
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pendentes</p>
+              <h3 class="text-3xl font-extrabold text-amber-500 mt-1" id="stat-pending">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+              <i data-lucide="clock" class="w-6 h-6"></i>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-amber-500"></div>
+          </div>
+
+          <!-- Validados -->
+          <div class="glass-panel p-5 rounded-xl flex items-center justify-between relative overflow-hidden">
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Validados</p>
+              <h3 class="text-3xl font-extrabold text-orange-400 mt-1" id="stat-validated">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400">
+              <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-orange-500"></div>
+          </div>
+
+          <!-- Faturamento Previsto / Arrecadado -->
+          <div class="glass-panel p-5 rounded-xl flex items-center justify-between relative overflow-hidden">
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Confirmado</p>
+              <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-1" id="stat-money">R$ 0,00</h3>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400">
+              <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-orange-500"></div>
+          </div>
+
+        </div>
+
+        <!-- Filtros do Painel -->
+        <div class="mb-6 flex flex-wrap gap-2 border-b border-white/5 pb-4">
+          <button onclick="app.setDashboardFilter('All')" class="tab-filter px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer bg-slate-800 text-white border border-white/10" id="tab-filter-All">
+            Todos
+          </button>
+          <button onclick="app.setDashboardFilter('Moto')" class="tab-filter px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer text-slate-400 hover:text-white bg-slate-900/60 hover:bg-slate-800/50 border border-white/5" id="tab-filter-Moto">
+            Moto
+          </button>
+          <button onclick="app.setDashboardFilter('Quadriciclo')" class="tab-filter px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer text-slate-400 hover:text-white bg-slate-900/60 hover:bg-slate-800/50 border border-white/5" id="tab-filter-Quadriciclo">
+            Quadriciclo
+          </button>
+          <button onclick="app.setDashboardFilter('UTV')" class="tab-filter px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer text-slate-400 hover:text-white bg-slate-900/60 hover:bg-slate-800/50 border border-white/5" id="tab-filter-UTV">
+            UTV
+          </button>
+          <button onclick="app.setDashboardFilter('Jeep')" class="tab-filter px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer text-slate-400 hover:text-white bg-slate-900/60 hover:bg-slate-800/50 border border-white/5" id="tab-filter-Jeep">
+            Jeep
+          </button>
+          <button onclick="app.setDashboardFilter('Carona/Zeca')" class="tab-filter px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer text-slate-400 hover:text-white bg-slate-900/60 hover:bg-slate-800/50 border border-white/5" id="tab-filter-Carona-Zeca">
+            Carona / Zeca
+          </button>
+        </div>
+
+        <!-- Tabela List View -->
+        <div class="glass-panel rounded-2xl overflow-hidden shadow-xl border border-white/5">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-950 text-xs text-slate-400 uppercase tracking-wider font-semibold border-b border-white/5">
+                  <th class="px-6 py-4">Nome Atleta</th>
+                  <th class="px-6 py-4">Contato</th>
+                  <th class="px-6 py-4">Categoria</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4">Data Registro</th>
+                  <th class="px-6 py-4 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="registrations-tbody" class="divide-y divide-white/5 text-sm text-slate-300">
+                <!-- Linhas inseridas dinamicamente via JS -->
+                <tr>
+                  <td colspan="6" class="px-6 py-12 text-center text-slate-500 font-medium">
+                    <i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto mb-2 text-slate-400"></i>
+                    Carregando inscrições...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- State Sem Inscrições -->
+          <div id="no-data-alert" class="hidden p-12 text-center text-slate-400">
+            <i data-lucide="inbox" class="w-12 h-12 mx-auto text-slate-600 mb-3"></i>
+            <p class="font-bold text-lg">Nenhuma inscrição encontrada</p>
+            <p class="text-sm text-slate-500 mt-1">Inscrições com a categoria ou filtros correspondentes aparecerão aqui.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TELA DE SUCESSO DA INSCRIÇÃO ==================== -->
+    <div id="modal-success-registration" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-950/85 backdrop-blur-sm no-print">
+      <div class="glass-panel w-full max-w-lg rounded-2xl p-6 sm:p-8 text-center shadow-2xl border border-white/10 relative overflow-hidden animate-fade-in-up">
+        
+        <!-- Efeito decorativo fundo -->
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-amber-500"></div>
+        
+        <!-- Ícone animados de Sucesso -->
+        <div class="w-20 h-20 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-500/10">
+          <i data-lucide="check-circle" class="w-12 h-12"></i>
+        </div>
+
+        <h3 class="text-3xl font-extrabold text-white mb-2">Inscrição Enviada!</h3>
+        <p class="text-slate-300 text-sm max-w-md mx-auto mb-6">
+          Sua inscrição foi cadastrada no sistema com status <span class="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold text-xs uppercase">Pendente</span>.
+        </p>
+
+        <!-- Informações complementares -->
+        <div class="bg-slate-900/60 border border-white/5 rounded-xl p-4 mb-6 text-left space-y-2.5 text-xs text-slate-300">
+          <p class="flex justify-between"><span>Nome Atleta:</span> <strong id="success-modal-name" class="text-white">Fulano de Tal</strong></p>
+          <p class="flex justify-between"><span>Categoria:</span> <strong id="success-modal-vehicle" class="text-white">Moto</strong></p>
+          <p class="flex justify-between"><span>Valor Pix:</span> <strong id="success-modal-price" class="text-orange-400">R$ 60,00</strong></p>
+          <p class="flex justify-between border-t border-white/5 pt-2"><span>Próximo Passo:</span> <strong class="text-amber-400">Aguardar validação da organização.</strong></p>
+        </div>
+
+        <p class="text-xs text-slate-400 leading-relaxed mb-6">
+          Assim que a nossa equipe validar o envio do seu comprovante Pix, enviaremos um e-mail contendo a sua <strong>Ficha de Inscrição Oficial (Voucher)</strong> com QR Code de confirmação.
+        </p>
+
+        <button onclick="app.closeSuccessModal()" class="glow-orange w-full py-3 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-xl transition-all cursor-pointer">
+          Entendido, Voltar à Home
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== TELA DE DETALHE DA INSCRIÇÃO (ADMIN MODAL) ==================== -->
+    <div id="modal-participant-detail" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-950/85 backdrop-blur-sm no-print overflow-y-auto">
+      <div class="glass-panel w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl border border-white/10 animate-fade-in-up my-8">
+        
+        <!-- Cabeçalho do modal -->
+        <div class="p-6 bg-gradient-to-r from-orange-500/10 to-slate-900 border-b border-white/5 flex justify-between items-center">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="user-cog" class="w-5 h-5 text-orange-500"></i>
+              Detalhes do Participante
+            </h3>
+            <p class="text-xs text-slate-400 mt-1" id="detail-date-display">Registrado em 16/06/2026</p>
+          </div>
+          <button onclick="app.closeDetailModal()" class="text-slate-400 hover:text-white transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Conteúdo do Detalhe -->
+        <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+          <!-- Grid Ficha Cadastral -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-900/60 border border-white/5 p-4 sm:p-5 rounded-xl">
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-500">Nome Completo</p>
+              <p class="text-sm font-semibold text-white mt-0.5" id="detail-name">-</p>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-500">E-mail</p>
+              <a href="#" id="detail-email-link" class="text-sm font-semibold text-orange-400 hover:underline mt-0.5 block">-</a>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-500">Telefone / WhatsApp</p>
+              <p class="text-sm font-semibold text-white mt-0.5" id="detail-phone">-</p>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-500">Cidade / Localização</p>
+              <p class="text-sm font-semibold text-white mt-0.5" id="detail-location">-</p>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-500">Categoria e Valor</p>
+              <p class="text-sm font-semibold text-white mt-0.5" id="detail-vehicle-price">-</p>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-500">Idade / Status</p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-sm font-semibold text-white" id="detail-age">- anos</span>
+                <span class="px-2 py-0.5 rounded font-bold text-[10px] uppercase border" id="detail-status-badge">Pendente</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fotos Carregadas pelo Atleta -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- ID Document -->
+            <div class="flex flex-col gap-2">
+              <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Documento de Identidade</span>
+              <div class="bg-slate-950 rounded-xl overflow-hidden border border-white/5 relative aspect-[4/3] group flex items-center justify-center">
+                <img id="detail-id-img" class="w-full h-full object-contain cursor-pointer transition-transform group-hover:scale-102" onclick="app.zoomImage(this.src)" src="" alt="Identidade do Atleta">
+                <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-white">
+                    <i data-lucide="zoom-in" class="w-4 h-4"></i> Ampliar Foto
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Receipt Document -->
+            <div class="flex flex-col gap-2">
+              <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Comprovante de Pagamento PIX</span>
+              <div class="bg-slate-950 rounded-xl overflow-hidden border border-white/5 relative aspect-[4/3] group flex items-center justify-center">
+                <img id="detail-receipt-img" class="w-full h-full object-contain cursor-pointer transition-transform group-hover:scale-102" onclick="app.zoomImage(this.src)" src="" alt="Comprovante Pix">
+                <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-white">
+                    <i data-lucide="zoom-in" class="w-4 h-4"></i> Ampliar Foto
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rodapé com as Ações do Admin -->
+        <div class="p-6 bg-slate-950 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <button onclick="app.openVoucherPreview()" id="admin-view-voucher-btn" class="w-full sm:w-auto px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="file-text" class="w-4 h-4 text-orange-400"></i>
+              <span>Visualizar Ficha / Voucher</span>
+            </button>
+          </div>
+          
+          <div class="flex gap-3">
+            <button onclick="app.closeDetailModal()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+              Fechar
+            </button>
+            <button onclick="app.validateCurrentParticipant()" id="admin-validate-btn" class="w-full sm:w-auto px-6 py-2.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>Validar Inscrição</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== TELA SIMULADOR DE ENVIO DE E-MAIL (PREVIEW DO VOUCHER) ==================== -->
+    <div id="modal-voucher-preview" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-950/85 backdrop-blur-sm overflow-y-auto no-print">
+      <div class="glass-panel w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border border-white/10 my-8">
+        
+        <!-- Cabeçalho do Voucher -->
+        <div class="p-4 sm:p-6 bg-slate-950 border-b border-white/5 flex justify-between items-center">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="mail-open" class="w-5 h-5 text-orange-500"></i>
+              Voucher Enviado por E-mail
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">Este e-mail é disparado automaticamente para o atleta ao validar.</p>
+          </div>
+          <button onclick="app.closeVoucherPreview()" class="text-slate-400 hover:text-white transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Conteúdo Simulação de Caixa de E-mail -->
+        <div class="p-4 sm:p-6 bg-slate-900/50 space-y-4">
+          <!-- Detalhes do Cabeçalho do Email -->
+          <div class="bg-slate-950 border border-white/5 rounded-xl p-3 sm:p-4 text-xs space-y-1 text-slate-400">
+            <p><span class="font-semibold text-slate-300">De:</span> organizacao@tsoramajari.com.br &lt;Sistema Automático&gt;</p>
+            <p><span class="font-semibold text-slate-300">Para:</span> <span id="voucher-email-to" class="text-orange-400">atleta@email.com</span></p>
+            <p><span class="font-semibold text-slate-300">Assunto:</span> INSCRIÇÃO CONFIRMADA - 12º Trilhão TSOR Amajari Off Road</p>
+          </div>
+
+          <!-- Corpo do Voucher (Ficha de Inscrição Oficial) -->
+          <div class="bg-white text-slate-950 rounded-xl p-6 shadow-lg font-sans relative border-2 border-orange-500" id="print-voucher-container">
+            <!-- Selo Oficial de Validação -->
+            <div class="absolute top-6 right-6 border-4 border-dashed border-orange-600 text-orange-600 rounded-lg px-3 py-1.5 font-extrabold text-sm uppercase tracking-widest transform rotate-12 select-none">
+              Inscrição Confirmada
+            </div>
+
+            <!-- Identidade Visual do Evento -->
+            <div class="flex items-center gap-2 border-b-2 border-slate-200 pb-4 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-orange-600 text-white flex items-center justify-center">
+                <i data-lucide="mountain-snow" class="w-6 h-6 text-white"></i>
+              </div>
+              <div>
+                <h4 class="font-black text-lg text-slate-900 tracking-wider">TSOR AMAJARI</h4>
+                <p class="text-[10px] text-slate-500 font-bold uppercase">FICHA DE INSCRIÇÃO OFICIAL</p>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-700 leading-relaxed mb-5">
+              Olá, <strong id="voucher-athlete-name">Fulano de Tal</strong>! <br>
+              Temos o prazer de informar que o seu pagamento foi recebido e a sua <strong>inscrição no 12º Trilhão está confirmada!</strong> Apresente esta ficha impressa ou na tela do celular no dia do credenciamento do evento.
+            </p>
+
+            <!-- Grid de dados cadastrados no voucher -->
+            <div class="grid grid-cols-2 gap-y-4 gap-x-6 bg-slate-50 rounded-lg p-4 border border-slate-100 text-xs mb-6 text-slate-800">
+              <div>
+                <p class="text-[9px] uppercase font-bold text-slate-400">ID Inscrição</p>
+                <p class="font-mono font-bold text-slate-900" id="voucher-id">reg_123456789</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase font-bold text-slate-400">Data Validação</p>
+                <p class="font-bold text-slate-900" id="voucher-validation-date">11/07/2026</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase font-bold text-slate-400">Categoria / Veículo</p>
+                <p class="font-bold text-slate-900" id="voucher-vehicle">Moto</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase font-bold text-slate-400">Valor Pago</p>
+                <p class="font-bold text-orange-600" id="voucher-price">R$ 60,00</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase font-bold text-slate-400">Documento de Identificação</p>
+                <p class="font-bold text-slate-900">Foto em Anexo (Verificado)</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase font-bold text-slate-400">Localização</p>
+                <p class="font-bold text-slate-900" id="voucher-location">Amajari / RR</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-[9px] uppercase font-bold text-slate-400">Contato Atleta</p>
+                <p class="font-bold text-slate-900" id="voucher-phone">(95) 99999-9999</p>
+              </div>
+            </div>
+
+            <!-- Instruções de Apoio e Rodapé -->
+            <div class="flex items-center gap-4 border-t border-slate-200 pt-4 text-[10px] text-slate-500">
+              <!-- QR Code Decorativo de Acreditação -->
+              <div class="w-16 h-16 border border-slate-300 p-1 flex-shrink-0 flex items-center justify-center bg-white">
+                <div class="grid grid-cols-4 grid-rows-4 gap-0.5 w-full h-full opacity-90">
+                  <div class="bg-slate-950"></div><div class="bg-slate-950"></div><div class="bg-white"></div><div class="bg-slate-950"></div>
+                  <div class="bg-slate-950"></div><div class="bg-white"></div><div class="bg-slate-950"></div><div class="bg-slate-950"></div>
+                  <div class="bg-white"></div><div class="bg-slate-950"></div><div class="bg-slate-950"></div><div class="bg-white"></div>
+                  <div class="bg-slate-950"></div><div class="bg-slate-950"></div><div class="bg-white"></div><div class="bg-slate-950"></div>
+                </div>
+              </div>
+              <div>
+                <h5 class="font-bold text-slate-800">INSTRUÇÕES IMPORTANTES:</h5>
+                <ul class="list-disc list-inside space-y-0.5 mt-1">
+                  <li>Credenciamento inicia às 07:00h em Amajari - RR, dia 11/07.</li>
+                  <li>Uso de equipamentos de segurança individuais é obrigatório.</li>
+                  <li>Este voucher é pessoal e intransferível.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rodapé do modal de envio de email / print -->
+        <div class="p-6 bg-slate-950 border-t border-white/5 flex justify-between gap-4">
+          <button onclick="app.closeVoucherPreview()" class="px-5 py-2 text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg transition-colors cursor-pointer">
+            Fechar E-mail
+          </button>
+          
+          <button onclick="window.print()" class="px-6 py-2.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Imprimir Ficha</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== POPUP ZOOM DE IMAGEM (ADMIN TOOL) ==================== -->
+    <div id="modal-image-zoom" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md no-print" onclick="app.closeImageZoom()">
+      <div class="relative max-w-4xl max-h-[85vh]">
+        <img id="zoom-img-target" class="rounded-xl max-h-[80vh] max-w-full object-contain shadow-2xl border border-white/10" src="">
+        <button class="absolute -top-12 right-0 text-slate-400 hover:text-white flex items-center gap-1.5 text-sm font-semibold transition-colors cursor-pointer">
+          <i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i> Fechar Zoom
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RODAPÉ DA PÁGINA (BRANDING) -->
+  <footer class="bg-slate-950 border-t border-white/5 py-8 text-center text-xs text-slate-500 no-print">
+    <p>© 2026 12º Trilhão TSOR Amajari Off Road. Desenvolvido por ANDRÉ VINICIUS.</p>
+    <p class="mt-1 text-slate-600">Orgulhosamente Roraimense. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- SCRIPTING (LOGIC & COMPONENT LOADING) -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
