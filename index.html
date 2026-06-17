@@ -309,7 +309,7 @@
               
               <!-- Foto do ID -->
               <div class="flex flex-col gap-2">
-                <span class="text-sm font-semibold text-slate-300">Documento com Foto (RG ou CNH) *</span>
+                <span class="text-sm font-semibold text-slate-300">Identificação *</span>
                 <div class="border-2 border-dashed border-slate-700 hover:border-orange-500 rounded-xl p-6 bg-slate-900/20 transition-all text-center relative group cursor-pointer" onclick="document.getElementById('idPhoto').click()">
                   <input type="file" id="idPhoto" name="idPhoto" accept="image/*" class="hidden" onchange="app.previewImage(this, 'id-preview')">
                   
@@ -322,11 +322,11 @@
                     <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-orange-400 transition-colors mb-3">
                       <i data-lucide="image" class="w-6 h-6"></i>
                     </div>
-                    <p class="text-sm text-slate-300 font-medium">Carregar Documento</p>
+                    <p class="text-sm text-slate-300 font-medium">Carregar</p>
                     <p class="text-xs text-slate-500 mt-1">Formatos suportados: JPG, PNG. Máx 5MB.</p>
                   </div>
                 </div>
-                <p class="hidden text-xs text-red-400 mt-1" id="error-idPhoto">Foto do documento de identificação é obrigatória.</p>
+                <p class="hidden text-xs text-red-400 mt-1" id="error-idPhoto">Foto de identificação é obrigatória.</p>
               </div>
 
               <!-- Upload do Comprovante Pix -->
