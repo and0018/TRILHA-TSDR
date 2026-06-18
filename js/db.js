@@ -235,6 +235,32 @@ class TrailDatabase {
     });
   }
 
+  async deleteRegistration(id) {
+    if (this.supabaseActive) {
+      try {
+        console.log(`Excluindo inscrição do Supabase: ${id}...`);
+        const { error } = await this.supabase
+          .from('registrations')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        return true;
+      } catch (err) {
+        console.error("Erro ao excluir no Supabase:", err);
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(id);
+
+      request.onsuccess = () => resolve(true);
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
   async uploadFileToSupabase(file, path) {
     const { data, error } = await this.supabase
       .storage

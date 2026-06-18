@@ -493,10 +493,15 @@ class TrailApp {
         <td class="px-6 py-4">${statusBadge}</td>
         <td class="px-6 py-4 text-xs font-mono text-slate-500">${regDate}</td>
         <td class="px-6 py-4 text-right">
+          <div class="flex items-center justify-end gap-2">
           <button onclick="app.openDetailModal('${r.id}')" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold border border-white/10 hover:border-orange-500/30 transition-all cursor-pointer inline-flex items-center gap-1">
             <i data-lucide="eye" class="w-3.5 h-3.5 text-orange-400"></i>
             <span>Visualizar</span>
           </button>
+          <button onclick="app.deleteRegistrationById('${r.id}')" class="px-3.5 py-1.5 bg-red-950/30 hover:bg-red-900/50 text-red-400 hover:text-white rounded-lg text-xs font-semibold border border-red-500/20 hover:border-red-500/50 transition-all cursor-pointer inline-flex items-center gap-1">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+          </div>
         </td>
       `;
       tbody.appendChild(tr);
@@ -588,6 +593,42 @@ class TrailApp {
       validateBtn.disabled = false;
       validateBtn.innerHTML = originalBtn;
       lucide.createIcons();
+    }
+  }
+
+  // Exclui inscrição pelo modal de detalhes
+  async deleteCurrentParticipant() {
+    if (!this.currentParticipant) return;
+
+    const confirmed = confirm(`Tem certeza que deseja excluir a inscrição de ${this.currentParticipant.fullName}? Esta ação não pode ser desfeita.`);
+    if (!confirmed) return;
+
+    try {
+      await window.db.deleteRegistration(this.currentParticipant.id);
+      this.showToast(`Inscrição de ${this.currentParticipant.fullName} excluída!`, "success");
+      this.closeDetailModal();
+      await this.refreshDashboard();
+    } catch (err) {
+      console.error(err);
+      this.showToast("Erro ao excluir inscrição.", "error");
+    }
+  }
+
+  // Exclui inscrição diretamente pela tabela
+  async deleteRegistrationById(id) {
+    const participant = this.allRegistrations.find(r => r.id === id);
+    if (!participant) return;
+
+    const confirmed = confirm(`Tem certeza que deseja excluir a inscrição de ${participant.fullName}? Esta ação não pode ser desfeita.`);
+    if (!confirmed) return;
+
+    try {
+      await window.db.deleteRegistration(id);
+      this.showToast(`Inscrição de ${participant.fullName} excluída!`, "success");
+      await this.refreshDashboard();
+    } catch (err) {
+      console.error(err);
+      this.showToast("Erro ao excluir inscrição.", "error");
     }
   }
 
