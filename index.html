@@ -350,56 +350,7 @@
             </div>
 
             <!-- INSTRUÇÃO DE PAGAMENTO PIX DINÂMICO -->
-            <div class="border-t border-white/5 pt-6">
-              <div class="bg-slate-900/80 border border-white/5 rounded-xl p-5 sm:p-6 flex flex-col md:flex-row items-center gap-6">
-                <!-- QR Code Simulado Premium -->
-                <div class="bg-white p-3 rounded-xl flex-shrink-0 relative shadow-lg">
-                  <div class="w-32 h-32 flex items-center justify-center border-2 border-orange-500/20 text-slate-900 relative">
-                    <!-- Detalhes decorativos nos cantos do QR Code -->
-                    <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-orange-600"></div>
-                    <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-orange-600"></div>
-                    <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-orange-600"></div>
-                    <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-orange-600"></div>
-                    
-                    <!-- QR Code central e logotipo simulado -->
-                    <div class="grid grid-cols-5 grid-rows-5 gap-1.5 w-24 h-24 opacity-80" id="pix-qr-simulation">
-                      <!-- Quadrantes simulados em CSS -->
-                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
-                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
-                      <div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-orange-500 rounded-sm scale-110"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
-                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div>
-                      <div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-200 rounded-sm"></div><div class="bg-slate-900 rounded-sm"></div>
-                    </div>
-                  </div>
-                  <div class="text-center mt-2">
-                    <span class="text-[10px] font-bold text-slate-800 tracking-wider">PIX INSTANTÂNEO</span>
-                  </div>
-                </div>
-
-                <!-- Textos explicativos e Pix Copia e Cola -->
-                <div class="flex-grow w-full">
-                  <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
-                    Realize o pagamento PIX
-                  </h3>
-                  <p class="text-sm text-slate-300 leading-relaxed mb-4">
-                    Para confirmar a sua inscrição na categoria <strong id="pix-instruction-category" class="text-orange-400">Moto</strong>, envie o valor exato de <strong id="pix-instruction-price" class="text-orange-400">R$ 60,00</strong>. Salve o comprovante e envie-o no campo de upload ao lado.
-                  </p>
-                  
-                  <!-- Chave Pix copia e cola com botão de ação -->
-                  <div class="flex flex-col sm:flex-row gap-2">
-                    <div class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-400 font-mono w-full select-all overflow-x-auto">
-                      <span id="pix-copy-key" class="break-all">00020126820014BR.GOV.BCB.PIX0136d5a14a7b-e389-45ca-aa4e-21b97615a7870220Trilhao DR Amajari5204000053039865802BR5919SIMONE PINTO GONDIM6009BOA VISTA622605227HeTaj0cpGTfBVUVlXSUIk63040A6D</span>
-                    </div>
-                    <button type="button" onclick="app.copyPixKey()" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all flex-shrink-0 cursor-pointer">
-                      <i data-lucide="copy" class="w-4 h-4 text-orange-400"></i>
-                      <span>Copiar Chave (Celular)</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            
             <!-- Botão de Envio de Inscrição -->
             <div class="border-t border-white/5 pt-6 flex justify-end">
               <button type="submit" class="glow-orange px-8 py-4 bg-orange-500 hover:bg-orange-455 text-slate-950 font-extrabold rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer text-base">
