@@ -291,7 +291,7 @@
 
               <!-- Telefone de Contato -->
               <div class="flex flex-col gap-1.5 md:col-span-2">
-                <label for="phone" class="text-sm font-semibold text-slate-300">WhaApp / Telefone com DDD *</label>
+                <label for="phone" class="text-sm font-semibold text-slate-300">WhatsApp / Telefone com DDD *</label>
                 <div class="relative">
                   <input type="text" id="phone" name="phone" required placeholder="(95) 99999-9999" class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-700 bg-slate-900/60 focus:bg-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-white placeholder-slate-500 outline-none transition-all">
                   <i data-lucide="phone" class="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500"></i>
@@ -585,7 +585,7 @@
         </div>
 
         <p class="text-base sm:text-[22px] text-slate-300 leading-relaxed mb-6 font-semibold">
-          Entre em contato com <strong class="text-white">(95) 98121-2049 ou (95) 98121-9810</strong>, para solicitar sua pulsera do evento.
+          Entre em contato com <strong class="text-white">(95) 98121-2049 ou (95) 98121-9810</strong>, para solicitar sua pulseira do evento.
         </p>
 
         <button onclick="app.closeSuccessModal()" class="glow-orange w-full py-3 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-xl transition-all cursor-pointer">
@@ -676,151 +676,24 @@
         </div>
 
         <!-- Rodapé com as Ações do Admin -->
-        <div class="p-6 bg-slate-950 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <button onclick="app.openVoucherPreview()" id="admin-view-voucher-btn" class="w-full sm:w-auto px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-              <i data-lucide="file-text" class="w-4 h-4 text-orange-400"></i>
-              <span>Visualizar Ficha / Voucher</span>
-            </button>
-          </div>
-          
-          <div class="flex gap-3">
-            <button onclick="app.closeDetailModal()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer">
-              Fechar
-            </button>
-            <button onclick="app.deleteCurrentParticipant()" id="admin-delete-btn" class="w-full sm:w-auto px-5 py-2.5 bg-red-950/40 border border-red-500/30 hover:bg-red-900/50 text-red-400 hover:text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-              <span>Excluir</span>
-            </button>
-            <button onclick="app.validateCurrentParticipant()" id="admin-validate-btn" class="w-full sm:w-auto px-6 py-2.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-              <i data-lucide="shield-check" class="w-4 h-4"></i>
-              <span>Validar Inscrição</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ==================== TELA SIMULADOR DE ENVIO DE E-MAIL (PREVIEW DO VOUCHER) ==================== -->
-    <div id="modal-voucher-preview" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-950/85 backdrop-blur-sm overflow-y-auto no-print">
-      <div class="glass-panel w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border border-white/10 my-8">
-        
-        <!-- Cabeçalho do Voucher -->
-        <div class="p-4 sm:p-6 bg-slate-950 border-b border-white/5 flex justify-between items-center">
-          <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i data-lucide="mail-open" class="w-5 h-5 text-orange-500"></i>
-              Voucher Enviado por E-mail
-            </h3>
-            <p class="text-xs text-slate-500 mt-1">Este e-mail é disparado automaticamente para o atleta ao validar.</p>
-          </div>
-          <button onclick="app.closeVoucherPreview()" class="text-slate-400 hover:text-white transition-colors cursor-pointer">
-            <i data-lucide="x" class="w-5 h-5"></i>
+        <div class="p-6 bg-slate-950 border-t border-white/5 flex justify-end gap-3">
+          <button onclick="app.closeDetailModal()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+            Fechar
           </button>
-        </div>
-
-        <!-- Conteúdo Simulação de Caixa de E-mail -->
-        <div class="p-4 sm:p-6 bg-slate-900/50 space-y-4">
-          <!-- Detalhes do Cabeçalho do Email -->
-          <div class="bg-slate-950 border border-white/5 rounded-xl p-3 sm:p-4 text-xs space-y-1 text-slate-400">
-            <p><span class="font-semibold text-slate-300">De:</span> organizacao@tsdramajari.com.br &lt;Sistema Automático&gt;</p>
-            <p><span class="font-semibold text-slate-300">Para:</span> <span id="voucher-email-to" class="text-orange-400">atleta@email.com</span></p>
-            <p><span class="font-semibold text-slate-300">Assunto:</span> INSCRIÇÃO CONFIRMADA - 12º Trilhão TSDR Amajari Off Road</p>
-          </div>
-
-          <!-- Corpo do Voucher (Ficha de Inscrição Oficial) -->
-          <div class="bg-white text-slate-950 rounded-xl p-6 shadow-lg font-sans relative border-2 border-orange-500" id="print-voucher-container">
-            <!-- Selo Oficial de Validação -->
-            <div class="absolute top-6 right-6 border-4 border-dashed border-orange-600 text-orange-600 rounded-lg px-3 py-1.5 font-extrabold text-sm uppercase tracking-widest transform rotate-12 select-none">
-              Inscrição Confirmada
-            </div>
-
-            <!-- Identidade Visual do Evento -->
-            <div class="flex items-center gap-2 border-b-2 border-slate-200 pb-4 mb-4">
-              <div class="w-10 h-10 rounded-lg bg-orange-600 text-white flex items-center justify-center">
-                <i data-lucide="mountain-snow" class="w-6 h-6 text-white"></i>
-              </div>
-              <div>
-                <h4 class="font-black text-lg text-slate-900 tracking-wider">TSDR AMAJARI</h4>
-                <p class="text-[10px] text-slate-500 font-bold uppercase">FICHA DE INSCRIÇÃO OFICIAL</p>
-              </div>
-            </div>
-
-            <p class="text-xs text-slate-700 leading-relaxed mb-5">
-              Olá, <strong id="voucher-athlete-name">Fulano de Tal</strong>! <br>
-              Temos o prazer de informar que o seu pagamento foi recebido e a sua <strong>inscrição no 12º Trilhão está confirmada!</strong> Apresente esta ficha impressa ou na tela do celular no dia do credenciamento do evento.
-            </p>
-
-            <!-- Grid de dados cadastrados no voucher -->
-            <div class="grid grid-cols-2 gap-y-4 gap-x-6 bg-slate-50 rounded-lg p-4 border border-slate-100 text-xs mb-6 text-slate-800">
-              <div>
-                <p class="text-[9px] uppercase font-bold text-slate-400">ID Inscrição</p>
-                <p class="font-mono font-bold text-slate-900" id="voucher-id">reg_123456789</p>
-              </div>
-              <div>
-                <p class="text-[9px] uppercase font-bold text-slate-400">Data Validação</p>
-                <p class="font-bold text-slate-900" id="voucher-validation-date">11/07/2026</p>
-              </div>
-              <div>
-                <p class="text-[9px] uppercase font-bold text-slate-400">Categoria / Veículo</p>
-                <p class="font-bold text-slate-900" id="voucher-vehicle">Moto</p>
-              </div>
-              <div>
-                <p class="text-[9px] uppercase font-bold text-slate-400">Valor Pago</p>
-                <p class="font-bold text-orange-600" id="voucher-price">R$ 60,00</p>
-              </div>
-              <div>
-                <p class="text-[9px] uppercase font-bold text-slate-400">Documento de Identificação</p>
-                <p class="font-bold text-slate-900">Foto em Anexo (Verificado)</p>
-              </div>
-              <div>
-                <p class="text-[9px] uppercase font-bold text-slate-400">Localização</p>
-                <p class="font-bold text-slate-900" id="voucher-location">Amajari / RR</p>
-              </div>
-              <div class="col-span-2">
-                <p class="text-[9px] uppercase font-bold text-slate-400">Contato Atleta</p>
-                <p class="font-bold text-slate-900" id="voucher-phone">(95) 99999-9999</p>
-              </div>
-            </div>
-
-            <!-- Instruções de Apoio e Rodapé -->
-            <div class="flex items-center gap-4 border-t border-slate-200 pt-4 text-[10px] text-slate-500">
-              <!-- QR Code Decorativo de Acreditação -->
-              <div class="w-16 h-16 border border-slate-300 p-1 flex-shrink-0 flex items-center justify-center bg-white">
-                <div class="grid grid-cols-4 grid-rows-4 gap-0.5 w-full h-full opacity-90">
-                  <div class="bg-slate-950"></div><div class="bg-slate-950"></div><div class="bg-white"></div><div class="bg-slate-950"></div>
-                  <div class="bg-slate-950"></div><div class="bg-white"></div><div class="bg-slate-950"></div><div class="bg-slate-950"></div>
-                  <div class="bg-white"></div><div class="bg-slate-950"></div><div class="bg-slate-950"></div><div class="bg-white"></div>
-                  <div class="bg-slate-950"></div><div class="bg-slate-950"></div><div class="bg-white"></div><div class="bg-slate-950"></div>
-                </div>
-              </div>
-              <div>
-                <h5 class="font-bold text-slate-800">INSTRUÇÕES IMPORTANTES:</h5>
-                <ul class="list-disc list-inside space-y-0.5 mt-1">
-                  <li>Credenciamento inicia às 07:00h em Amajari - RR, dia 11/07.</li>
-                  <li>Uso de equipamentos de segurança individuais é obrigatório.</li>
-                  <li>Este voucher é pessoal e intransferível.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Rodapé do modal de envio de email / print -->
-        <div class="p-6 bg-slate-950 border-t border-white/5 flex justify-between gap-4">
-          <button onclick="app.closeVoucherPreview()" class="px-5 py-2 text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg transition-colors cursor-pointer">
-            Fechar E-mail
+          <button onclick="app.deleteCurrentParticipant()" id="admin-delete-btn" class="px-5 py-2.5 bg-red-950/40 border border-red-500/30 hover:bg-red-900/50 text-red-400 hover:text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            <span>Excluir</span>
           </button>
-          
-          <button onclick="window.print()" class="px-6 py-2.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-            <i data-lucide="printer" class="w-4 h-4"></i>
-            <span>Imprimir Ficha</span>
+          <button onclick="app.validateCurrentParticipant()" id="admin-validate-btn" class="px-6 py-2.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Validar Inscrição</span>
           </button>
         </div>
 
       </div>
     </div>
+
+
 
     <!-- ==================== POPUP ZOOM DE IMAGEM (ADMIN TOOL) ==================== -->
     <div id="modal-image-zoom" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md no-print" onclick="app.closeImageZoom()">

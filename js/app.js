@@ -55,10 +55,11 @@ class TrailApp {
       document.getElementById('admin-access-btn').classList.add('hidden');
       document.getElementById('admin-logout-btn').classList.remove('hidden');
       document.getElementById('admin-logout-btn').classList.add('flex');
+      this.showView('admin');
+    } else {
+      // 5. Exibe a tela inicial padrão (Landing)
+      this.showView('landing');
     }
-
-    // 5. Exibe a tela inicial padrão (Landing)
-    this.showView('landing');
   }
 
   // Alterna entre as Telas da Single Page Application (SPA)
@@ -537,18 +538,15 @@ class TrailApp {
     // Status Badge e Botão de Validação
     const badge = document.getElementById('detail-status-badge');
     const validateBtn = document.getElementById('admin-validate-btn');
-    const viewVoucherBtn = document.getElementById('admin-view-voucher-btn');
 
     if (participant.status === 'Validado') {
       badge.className = 'px-2 py-0.5 rounded font-bold text-[10px] uppercase bg-orange-500/10 border border-orange-500/20 text-orange-400';
       badge.innerText = 'Validado';
       validateBtn.classList.add('hidden');
-      viewVoucherBtn.classList.remove('hidden');
     } else {
       badge.className = 'px-2 py-0.5 rounded font-bold text-[10px] uppercase bg-amber-500/10 border border-amber-500/20 text-amber-400';
       badge.innerText = 'Pendente';
       validateBtn.classList.remove('hidden');
-      viewVoucherBtn.classList.add('hidden');
     }
 
     const modal = document.getElementById('modal-participant-detail');
@@ -583,9 +581,6 @@ class TrailApp {
       // Recarrega dados e atualiza a interface de detalhe
       await this.refreshDashboard();
       this.openDetailModal(this.currentParticipant.id);
-
-      // Dispara a simulação do voucher
-      this.openVoucherPreview();
     } catch (err) {
       console.error(err);
       this.showToast("Falha ao salvar a validação.", "error");
@@ -629,43 +624,6 @@ class TrailApp {
     } catch (err) {
       console.error(err);
       this.showToast("Erro ao excluir inscrição.", "error");
-    }
-  }
-
-  // Abre Simulação do E-mail e Visualização da Ficha de Inscrição Oficial (Voucher)
-  openVoucherPreview() {
-    if (!this.currentParticipant) return;
-    const participant = this.currentParticipant;
-
-    document.getElementById('voucher-email-to').innerText = participant.email;
-    document.getElementById('voucher-athlete-name').innerText = participant.fullName;
-    document.getElementById('voucher-id').innerText = participant.id;
-    document.getElementById('voucher-vehicle').innerText = participant.vehicleType;
-    document.getElementById('voucher-price').innerText = `R$ ${participant.price.toFixed(2).replace('.', ',')}`;
-    document.getElementById('voucher-location').innerText = participant.location;
-    document.getElementById('voucher-phone').innerText = participant.phone;
-    
-    // Data de validação simulada como HOJE
-    const today = new Date().toLocaleDateString('pt-BR', {
-      day: '2-digit', month: '2-digit', year: 'numeric'
-    });
-    document.getElementById('voucher-validation-date').innerText = today;
-
-    // Fecha o modal de detalhes para exibir o voucher limpo
-    this.closeDetailModal();
-
-    const voucherModal = document.getElementById('modal-voucher-preview');
-    voucherModal.classList.remove('hidden');
-    voucherModal.classList.add('flex');
-    lucide.createIcons();
-  }
-
-  closeVoucherPreview() {
-    document.getElementById('modal-voucher-preview').classList.add('hidden');
-    document.getElementById('modal-voucher-preview').classList.remove('flex');
-    // Reabre o painel de detalhes do admin para melhor fluxo de trabalho
-    if (this.currentParticipant) {
-      this.openDetailModal(this.currentParticipant.id);
     }
   }
 
