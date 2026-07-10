@@ -1,46 +1,48 @@
 // js/auth.js
-// Controle de Autenticação do Administrador
+// Controle de Autenticação do Administrador via Supabase Auth
 
 class TrailAuth {
   constructor() {
     this.sessionKey = 'trail_admin_authenticated';
-    // Credenciais padrão do painel (podem ser alteradas ou integradas com Firebase no futuro)
-    this.defaultUsername = 'Nanda';
-    this.defaultPassword = 'amajariTrilha26';
   }
 
-  // Verifica se o administrador está logado na sessão atual
-  isAdminLoggedIn() {
-    return sessionStorage.getItem(this.sessionKey) === 'true';
-  }
-
-  // Realiza a tentativa de login simulado
-  async login(username, password) {
-    // Simula uma pequena latência de rede para feedback visual premium
-    await new Promise(resolve => setTimeout(resolve, 600));
-
-    const checkUser = username.trim().toLowerCase() === this.defaultUsername.toLowerCase();
-    const checkPass = password === this.defaultPassword;
-
-    if (checkUser && checkPass) {
-      sessionStorage.setItem(this.sessionKey, 'true');
-      console.log("Administrador autenticado com sucesso.");
-      return { success: true };
-    } else {
-      console.warn("Credenciais de administrador incorretas.");
-      return { 
-        success: false, 
-        message: "Usuário ou senha incorretos." 
-      };
+  // Verifica se o administrador está logado (checa a sessão do Supabase)
+  async isAdminLoggedIn() {
+    if (!window.db || !window.db.supabase) return false;
+    try {
+      const { data: { session } } = await window.db.supabase.auth.getSession();
+      return !!session;
+    } catch {
+      return false;
     }
   }
 
+  // Realiza login via Supabase Auth (email + senha)
+  async login(email, password) {
+    if (!window.db || !window.db.supabase) {
+      return { success: false, message: "Sistema não inicializado. Recarregue a página." };
+    }
+
+    const { data, error } = await window.db.supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      return { success: false, message: "E-mail ou senha incorretos." };
+    }
+
+    sessionStorage.setItem(this.sessionKey, 'true');
+    return { success: true };
+  }
+
   // Desloga o administrador
-  logout() {
+  async logout() {
+    if (window.db && window.db.supabase) {
+      await window.db.supabase.auth.signOut();
+    }
     sessionStorage.removeItem(this.sessionKey);
-    console.log("Administrador desconectado.");
   }
 }
 
-// Expõe uma instância global
 window.auth = new TrailAuth();

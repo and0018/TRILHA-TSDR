@@ -51,19 +51,19 @@ class TrailApp {
     }
 
     // 4. Se o admin já estiver logado (em reloads), permite manter a sessão
-    if (window.auth.isAdminLoggedIn()) {
+    if (await window.auth.isAdminLoggedIn()) {
       document.getElementById('admin-access-btn').classList.add('hidden');
       document.getElementById('admin-logout-btn').classList.remove('hidden');
       document.getElementById('admin-logout-btn').classList.add('flex');
-      this.showView('admin');
+      await this.showView('admin');
     } else {
       // 5. Exibe a tela inicial padrão (Landing)
-      this.showView('landing');
+      await this.showView('landing');
     }
   }
 
   // Alterna entre as Telas da Single Page Application (SPA)
-  showView(viewName) {
+  async showView(viewName) {
     const views = ['landing', 'registration', 'admin'];
     views.forEach(v => {
       const el = document.getElementById(`view-${v}`);
@@ -79,7 +79,7 @@ class TrailApp {
 
     // Pós-carregamento específico de tela
     if (viewName === 'admin') {
-      if (!window.auth.isAdminLoggedIn()) {
+      if (!await window.auth.isAdminLoggedIn()) {
         this.openAdminAccess();
       } else {
         this.refreshDashboard();
@@ -335,15 +335,15 @@ class TrailApp {
   // ==================== ADMIN SYSTEM LOGIC ====================
 
   // Abre janela pop-up de Login do Administrador
-  openAdminAccess() {
-    if (window.auth.isAdminLoggedIn()) {
+  async openAdminAccess() {
+    if (await window.auth.isAdminLoggedIn()) {
       this.showView('admin');
       return;
     }
     const loginModal = document.getElementById('modal-admin-login');
     loginModal.classList.remove('hidden');
     loginModal.classList.add('flex');
-    document.getElementById('admin-user').focus();
+    document.getElementById('admin-email').focus();
   }
 
   closeAdminAccess() {
@@ -354,7 +354,7 @@ class TrailApp {
   // Trata a autenticação
   async handleAdminLogin(event) {
     event.preventDefault();
-    const username = document.getElementById('admin-user').value;
+    const email = document.getElementById('admin-email').value;
     const password = document.getElementById('admin-password').value;
     const errorEl = document.getElementById('admin-login-error');
     const submitBtn = document.getElementById('admin-login-submit');
@@ -364,7 +364,7 @@ class TrailApp {
     submitBtn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Autenticando...`;
     lucide.createIcons();
 
-    const response = await window.auth.login(username, password);
+    const response = await window.auth.login(email, password);
 
     if (response.success) {
       this.closeAdminAccess();
@@ -385,8 +385,8 @@ class TrailApp {
   }
 
   // Desconecta o Admin
-  logoutAdmin() {
-    window.auth.logout();
+  async logoutAdmin() {
+    await window.auth.logout();
     document.getElementById('admin-logout-btn').classList.add('hidden');
     document.getElementById('admin-logout-btn').classList.remove('flex');
     document.getElementById('admin-access-btn').classList.remove('hidden');
