@@ -4,7 +4,7 @@
 class TrailApp {
   constructor() {
     this.selectedVehicle = 'Moto';
-    this.selectedPrice = 60.00;
+    this.selectedPrice = 70.00;
     this.idPhotoFile = null;
     this.receiptFile = null;
     this.currentFilter = 'All';
